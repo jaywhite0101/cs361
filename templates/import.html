@@ -1,0 +1,128 @@
+{% extends "layout.html" %}
+{% block title %}Import a Recipe{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 680px;">
+
+  <h1 class="page-title">Recipe Import</h1>
+  <p class="page-subtitle">Paste a link (or many links) to save recipes to your database automatically.</p>
+  <p class="page-subtitle">See sites you can import recipes from <a href="https://docs.recipe-scrapers.com/getting-started/supported-sites/" target="_blank">here</a>.</p>
+
+  <!-- tab switcher -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tabSingle" onclick="showTab('single')">Single Recipe</button>
+    <button class="tab-btn"        id="tabBulk"   onclick="showTab('bulk')">Bulk Import</button>
+  </div>
+
+  <!-- single import -->
+  <div id="paneSingle">
+    <form action="{{ url_for('scrape_recipe') }}" method="POST">
+      <div style="display:flex; gap:0.75rem; margin-bottom: 1.25rem;">
+        <input
+          type="url"
+          name="url"
+          placeholder="Paste recipe URL here… e.g. https://www.allrecipes.com/recipe/…"
+          required
+          style="flex:1;"
+        />
+        <button type="submit" class="btn btn-primary">Import</button>
+      </div>
+    </form>
+
+    <!-- IH#6: Explicit path -->
+    <div class="steps-box">
+      <div class="steps-header">How to import a recipe</div>
+      {% for step in [
+        "Find a recipe you want to save online.",
+        "Copy the link at the top of the page.",
+        "Paste the link in the import bar above.",
+        "Click Import — the recipe will be saved and formatted automatically.",
+        "You can then find it in Recipe Search."
+      ] %}
+      <div class="step-row">
+        <span class="step-num">{{ loop.index }}</span>
+        <span>{{ step }}</span>
+      </div>
+      {% endfor %}
+      <!-- IH#2: Explain cost (time) -->
+      <div class="step-note">⏱ Note: Importing a recipe may take up to five seconds while we scrape and format it.</div>
+    </div>
+  </div>
+
+  <!-- bulk import -->
+  <div id="paneBulk" style="display:none;">
+    <form action="{{ url_for('bulk_import') }}" method="POST">
+      <label style="font-weight:700; display:block; margin-bottom:6px;">
+        Paste recipe URLs — one per line
+      </label>
+      <textarea
+        name="urls"
+        rows="10"
+        placeholder="https://www.allrecipes.com/recipe/...&#10;https://www.seriouseats.com/recipe/...&#10;https://www.foodnetwork.com/recipes/..."
+        style="resize:vertical; margin-bottom:0.85rem; font-size:0.88rem;"
+        required
+      ></textarea>
+
+      <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+        <button type="submit" class="btn btn-primary">Import All</button>
+        <span style="font-size:0.85rem; color:var(--text-muted);">
+          Each URL is scraped in sequence. Failed URLs are reported individually.
+        </span>
+      </div>
+    </form>
+
+    <div class="steps-box" style="margin-top:1.25rem;">
+      <div class="steps-header">Tips for bulk importing</div>
+      <div class="step-row"><span class="step-num">1</span><span>Collect recipe links, one per line, into the text box above.</span></div>
+      <div class="step-row"><span class="step-num">2</span><span>Click Import All — each link is scraped one by one.</span></div>
+      <div class="step-row"><span class="step-num">3</span><span>Any links that fail are listed individually so you can retry them.</span></div>
+      <div class="step-note">⏱ Note: Bulk importing takes a few seconds per recipe — be patient with longer lists.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 1.5rem; text-align: center;">
+    <a href="{{ url_for('search') }}" class="btn btn-secondary">← View saved recipes</a>
+  </div>
+</div>
+
+<style>
+  .tab-bar {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 2px solid var(--border);
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    padding: 0.55rem 1.2rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn:hover  { color: var(--accent); }
+
+  .steps-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .steps-header { padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border); font-weight: 700; color: var(--accent-dark); font-size: 0.92rem; }
+  .step-row { padding: 0.72rem 1.25rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; display: flex; gap: 0.75rem; align-items: flex-start; }
+  .step-num { min-width: 22px; height: 22px; background: var(--accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; margin-top: 1px; flex-shrink: 0; }
+  .step-note { padding: 0.6rem 1.25rem; font-size: 0.82rem; color: var(--text-muted); font-style: italic; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function showTab(tab) {
+    document.getElementById('paneSingle').style.display = tab === 'single' ? 'block' : 'none';
+    document.getElementById('paneBulk').style.display   = tab === 'bulk'   ? 'block' : 'none';
+    document.getElementById('tabSingle').classList.toggle('active', tab === 'single');
+    document.getElementById('tabBulk').classList.toggle('active',   tab === 'bulk');
+  }
+</script>
+{% endblock %}

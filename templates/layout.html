@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Recipe Database{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --nav-bg:      #fff7ed;
+      --nav-hover:   #fed7aa;
+      --btn-bg:      #fff7ed;
+      --btn-hover:   #ffedd5;
+      --accent:      #ea580c;
+      --accent-dark: #c2410c;
+      --bg:          #ffffff;
+      --surface:     #fafaf9;
+      --border:      #e2e8f0;
+      --text:        #1e293b;
+      --text-muted:  #64748b;
+      --danger:      #dc2626;
+      --danger-hover:#b91c1c;
+      --success-bg:  #dcfce7;
+      --success-text:#166534;
+      --error-bg:    #fee2e2;
+      --error-text:  #991b1b;
+      --info-bg:     #dbeafe;
+      --info-text:   #1e40af;
+      --shadow:      0 2px 8px rgba(0,0,0,0.07);
+      --radius:      12px;
+    }
+
+    body.dark-mode {
+      --nav-bg:      #1e293b;
+      --nav-hover:   #334155;
+      --btn-bg:      #1e293b;
+      --btn-hover:   #334155;
+      --accent:      #fb923c;
+      --accent-dark: #fdba74;
+      --bg:          #0f172a;
+      --surface:     #1e293b;
+      --border:      #334155;
+      --text:        #f1f5f9;
+      --text-muted:  #94a3b8;
+      --shadow:      0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: background-color 0.3s, color 0.3s;
+      min-height: 100vh;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Playfair Display', serif;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* navbar */
+    nav {
+      background-color: var(--nav-bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      height: 56px;
+      transition: background-color 0.3s;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .nav-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-dark);
+      margin-left: 0.5rem;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .nav-links a {
+      padding: 0.4rem 0.85rem;
+      border-radius: 8px;
+      color: var(--accent-dark);
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      background: var(--nav-hover);
+      text-decoration: none;
+    }
+
+    /* dark mode toggle — moon icon (IH#4) */
+    #darkModeBtn {
+      background: var(--btn-bg);
+      border: 2px solid var(--border);
+      border-radius: 50px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    #darkModeBtn:hover { background: var(--btn-hover); }
+    #darkModeBtn .icon { font-size: 1rem; }
+
+    .flash-container {
+      max-width: 860px;
+      margin: 1rem auto 0;
+      padding: 0 1.5rem;
+    }
+
+    .flash {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .flash.success { background: var(--success-bg); color: var(--success-text); }
+    .flash.error   { background: var(--error-bg);   color: var(--error-text); }
+    .flash.info    { background: var(--info-bg);     color: var(--info-text); }
+
+    /* page container */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 3rem;
+    }
+
+    /* buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.55rem 1.2rem;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      transition: background 0.2s, transform 0.1s;
+      text-decoration: none;
+    }
+    .btn:hover { transform: translateY(-1px); text-decoration: none; }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--accent-dark); }
+
+    .btn-secondary {
+      background: var(--btn-bg);
+      color: var(--text);
+      border: 2px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--btn-hover); }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+    .btn-danger:hover { background: var(--danger-hover); }
+
+    /* cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+
+    /* inputs */
+    input[type="text"],
+    input[type="url"],
+    textarea {
+      width: 100%;
+      padding: 0.65rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem;
+      background: var(--bg);
+      color: var(--text);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    input[type="text"]:focus,
+    input[type="url"]:focus,
+    textarea:focus {
+      border-color: var(--accent);
+    }
+
+    /* modals */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 440px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .modal h3 { margin-bottom: 0.75rem; }
+    .modal p  { color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.95rem; line-height: 1.6; }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+
+    /* tags */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      background: var(--btn-bg);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .chip-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0;
+    }
+    .chip-remove:hover { color: var(--danger); }
+
+    .page-title {
+      font-size: 2rem;
+      color: var(--accent-dark);
+      margin-bottom: 0.25rem;
+    }
+
+    .page-subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <span style="font-size:1.4rem;">🍽️</span>
+    <span class="nav-brand">Recipe Database</span>
+  </div>
+
+  <div class="nav-links">
+    <a href="{{ url_for('index') }}"       {% if request.endpoint == 'index' %}class="active"{% endif %}>Home</a>
+    <a href="{{ url_for('import_page') }}" {% if request.endpoint == 'import_page' %}class="active"{% endif %}>Import</a>
+    <a href="{{ url_for('search') }}"      {% if request.endpoint == 'search' %}class="active"{% endif %}>Recipe Search</a>
+    <a href="{{ url_for('faq') }}"         {% if request.endpoint == 'faq' %}class="active"{% endif %}>Information</a>
+  </div>
+
+  <!-- moon icon for dark mode — satisfies IH#4 -->
+  <button id="darkModeBtn" onclick="toggleDarkMode()" title="Toggle dark mode">
+    <span class="icon" id="darkIcon">🌙</span>
+    <span id="darkLabel">Dark Mode</span>
+  </button>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+
+<script>
+  // persist dark mode preference across pages
+  function toggleDarkMode() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', isDark ? '1' : '0');
+    updateDarkBtn(isDark);
+  }
+
+  function updateDarkBtn(isDark) {
+    document.getElementById('darkIcon').textContent  = isDark ? '☀️' : '🌙';
+    document.getElementById('darkLabel').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+  }
+
+  // apply on load
+  (function() {
+    const pref = localStorage.getItem('darkMode');
+    if (pref === '1') {
+      document.body.classList.add('dark-mode');
+      updateDarkBtn(true);
+    }
+  })();
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

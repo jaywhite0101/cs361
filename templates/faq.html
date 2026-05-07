@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+{% block title %}Information{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 660px;">
+
+  <h1 class="page-title">Information</h1>
+  <p class="page-subtitle">Frequently asked questions and how-to guides.</p>
+
+  <!-- IH#3: Let users gather only what they want — accordion pattern -->
+  {% set faqs = [
+    {
+      "q": "How do I import a recipe?",
+      "a": "Go to the <strong>Import</strong> page from the navigation bar. Find a recipe online, copy its URL, paste it into the import bar, and click <strong>Import</strong>. The recipe will be scraped, formatted, and added to your database automatically. You can then find it in <strong>Recipe Search</strong>."
+    },
+    {
+      "q": "How do I exclude allergens?",
+      "a": "Go to <strong>Recipe Search</strong> and click the <strong>Allergens (exclude)</strong> field. Type any allergen (e.g. \"butter\", \"whey\", \"peanut\") and press Add or Enter. You can also use the quick-add preset buttons for common allergens like lactose or gluten. Any recipe containing those ingredient strings will be hidden from results."
+    },
+    {
+      "q": "How do I use dark mode?",
+      "a": "Click the <strong>🌙 Dark Mode</strong> button in the top-right corner of the navigation bar. Your preference is saved automatically. It will stay on even after you refresh the page."
+    },
+    {
+      "q": "Can I edit a recipe after importing it?",
+      "a": "Yes. Open any recipe from the search page and click <strong>✏️ Edit Recipe</strong>. You can change the title, ingredients, and instructions. Your changes are saved immediately."
+    },
+    {
+      "q": "How do I delete a recipe?",
+      "a": "Open the recipe and click <strong>🗑️ Delete Recipe</strong>. A confirmation dialog will appear. You must confirm before the recipe is permanently removed. If you change your mind, click <strong>No, Cancel</strong>. To restore a deleted recipe, re-import it from the original link."
+    },
+    {
+      "q": "Why doesn't the filter catch every allergen-containing recipe?",
+      "a": "The basic filter matches exact strings. For example, filtering out \"milk\" won't catch \"whey\" or \"casein\". To be thorough, add multiple related terms (e.g. \"milk\", \"butter\", \"cream\", \"whey\", \"dairy\") or use the Lactose preset button on the search page. A smarter ingredient-mapping filter is planned for a future sprint."
+    },
+    {
+      "q": "Why do some recipe links not work?",
+      "a": "Not all recipe websites are supported by the scraper library. Sites that require a login or block automated access may not import correctly. If you get an error, try a different recipe website."
+    }
+  ] %}
+
+  {% for item in faqs %}
+  <div class="accordion-item">
+    <button class="accordion-header" onclick="toggleFaq(this)">
+      <span>{{ item.q }}</span>
+      <span class="accordion-icon">▾</span>
+    </button>
+    <div class="accordion-body">
+      <p>{{ item.a | safe }}</p>
+    </div>
+  </div>
+  {% endfor %}
+
+</div>
+
+<style>
+  .accordion-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 0.65rem;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .accordion-header {
+    width: 100%;
+    background: var(--btn-bg);
+    border: none;
+    padding: 0.9rem 1.25rem;
+    text-align: left;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+  }
+  .accordion-header:hover { background: var(--btn-hover); }
+
+  .accordion-icon {
+    font-size: 1.1rem;
+    transition: transform 0.25s;
+  }
+  .accordion-header.open .accordion-icon { transform: rotate(180deg); }
+
+  .accordion-body {
+    display: none;
+    padding: 1rem 1.25rem;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: var(--text);
+    border-top: 1px solid var(--border);
+  }
+  .accordion-body.open { display: block; }
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function toggleFaq(btn) {
+    const body = btn.nextElementSibling;
+    const isOpen = body.classList.contains('open');
+    // close all
+    document.querySelectorAll('.accordion-body').forEach(b => b.classList.remove('open'));
+    document.querySelectorAll('.accordion-header').forEach(b => b.classList.remove('open'));
+    // open clicked (unless it was already open)
+    if (!isOpen) {
+      body.classList.add('open');
+      btn.classList.add('open');
+    }
+  }
+</script>
+{% endblock %}

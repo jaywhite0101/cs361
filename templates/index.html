@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+<div class="container" style="text-align:center; padding-top: 3.5rem;">
+
+  <h1 class="page-title" style="font-size:2.8rem;">Welcome!</h1>
+
+  <!-- IH#1: Explain benefits of the program up front -->
+  <div style="
+    max-width: 620px;
+    margin: 1.25rem auto 2.5rem;
+    background: var(--btn-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem 1.6rem;
+    font-size: 0.97rem;
+    line-height: 1.7;
+    color: var(--text);
+    text-align: left;
+  ">
+    This program lets you find and save recipes
+    without the long life-stories included on most recipe sites. Its main feature
+    is an allergen-filter system so you can easily find recipes that
+    are safe for your specific dietary needs, whether that's a common
+    allergy or something more unusual.
+    <br /><br />
+    To get started, go to <strong>Import</strong> to save recipes from any link,
+    then use <strong>Recipe Search</strong> to find and filter them. If you have
+    questions, check the <strong>Information</strong> page.
+  </div>
+
+  <!-- nav cards  -->
+  <div style="
+    display: flex;
+    gap: 1.25rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  ">
+    <a href="{{ url_for('import_page') }}" class="home-card">
+      <div class="home-card-icon">🔗</div>
+      <div class="home-card-label">Import</div>
+      <div class="home-card-desc">Paste a recipe link to save it to your database</div>
+    </a>
+
+    <a href="{{ url_for('search') }}" class="home-card">
+      <div class="home-card-icon">⌕</div>
+      <div class="home-card-label">Recipe Search</div>
+      <div class="home-card-desc">Browse and filter your saved recipes</div>
+    </a>
+
+    <a href="{{ url_for('faq') }}" class="home-card">
+      <div class="home-card-icon">ⓘ</div>
+      <div class="home-card-label">Information</div>
+      <div class="home-card-desc">How-to guides and frequently asked questions</div>
+    </a>
+  </div>
+</div>
+
+<style>
+  .home-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 200px;
+    padding: 2rem 1.25rem;
+    background: var(--btn-bg);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--text);
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .home-card:hover {
+    background: var(--btn-hover);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    text-decoration: none;
+  }
+  .home-card-icon  { font-size: 2.4rem; }
+  .home-card-label { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--accent-dark); }
+  .home-card-desc  { font-size: 0.8rem; color: var(--text-muted); text-align: center; line-height: 1.4; }
+</style>
+{% endblock %}
