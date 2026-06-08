@@ -1,222 +1,85 @@
-{% extends "layout.html" %} {% block title %}Recipe Search{%
-endblock %} {% block content %}
+{% extends "layout.html" %} {% block title %}Recipe Search{% endblock %} {% block content %}
 <div class="container">
   <h1 class="page-title">Recipe Search</h1>
   <p class="page-subtitle">
     Search your saved recipes and filter by allergens or ingredients.
   </p>
 
-  <!-- search + filter Form -->
   <form method="GET" action="{{ url_for('search') }}" id="searchForm">
+
     <!-- Row 1: text search + submit -->
-    <div style="display: flex; gap: 0.75rem; margin-bottom: 0.85rem">
-      <input
-        type="text"
-        name="q"
-        id="queryInput"
-        placeholder="Search recipes…"
-        value="{{ query }}"
-        style="flex: 1"
-      />
+    <div style="display:flex; gap:0.75rem; margin-bottom:0.85rem;">
+      <input type="text" name="q" id="queryInput"
+        placeholder="Search recipes…" value="{{ query }}" style="flex:1;" />
       <button type="submit" class="btn btn-primary">Search</button>
     </div>
 
-    <!-- Row 2: allergen exclude + include toggle -->
-    <div
-      style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem"
-    >
-      <!-- allergen exclude section -->
-      <div style="flex: 1; min-width: 240px">
-        <label
-          style="
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 4px;
-          "
-        >
+    <!-- Row 2: allergen / include filters -->
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:0.5rem;">
+
+      <!-- allergen exclude -->
+      <div style="flex:1; min-width:240px;">
+        <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">
           🚫 Allergens (exclude)
         </label>
-        <div style="display: flex; gap: 0.5rem">
-          <input
-            type="text"
-            id="allergenInput"
-            placeholder="e.g. milk, butter, egg…"
-            style="flex: 1"
-          />
-          <button
-            type="button"
-            class="btn btn-secondary"
-            onclick="addAllergen()"
-            style="padding: 0.55rem 1rem"
-          >
-            Add
-          </button>
+        <div style="display:flex; gap:0.5rem;">
+          <input type="text" id="allergenInput" placeholder="e.g. milk, butter, egg…" style="flex:1;" />
+          <button type="button" class="btn btn-secondary" onclick="addAllergen()" style="padding:0.55rem 1rem;">Add</button>
         </div>
-        <!-- hidden field carries comma-separated list -->
-        <input
-          type="hidden"
-          name="allergens"
-          id="allergensHidden"
-          value="{{ allergens }}"
-        />
+        <input type="hidden" name="allergens" id="allergensHidden" value="{{ allergens }}" />
 
-        <!-- IH#7: Different approaches, preset common allergen groups -->
-        <div
-          style="
-            margin-top: 0.5rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-          "
-        >
-          <span
-            style="
-              font-size: 0.78rem;
-              color: var(--text-muted);
-              align-self: center;
-            "
-            >Quick add:</span
-          >
-          <button
-            type="button"
-            class="preset-btn"
-            onclick="addPreset('milk,butter,cream,cheese,whey,lactose,dairy')"
-          >
-            Lactose
-          </button>
-          <button
-            type="button"
-            class="preset-btn"
-            onclick="addPreset('flour,wheat,gluten,bread,semolina,barley,rye')"
-          >
-            Gluten
-          </button>
-          <button
-            type="button"
-            class="preset-btn"
-            onclick="addPreset('peanut,peanuts,peanut butter')"
-          >
-            Peanut
-          </button>
-          <button
-            type="button"
-            class="preset-btn"
-            onclick="addPreset('egg,eggs,egg yolk,egg white')"
-          >
-            Egg
-          </button>
-          <button
-            type="button"
-            class="preset-btn"
-            onclick="
-              addPreset('shrimp,shellfish,crab,lobster,clam,oyster,scallop')
-            "
-          >
-            Shellfish
-          </button>
-          <button
-            type="button"
-            class="preset-btn"
-            onclick="
-              addPreset(
-                'almond,walnut,cashew,pecan,pistachio,hazelnut,tree nut',
-              )
-            "
-          >
-            Tree Nuts
-          </button>
+        <div style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.4rem;">
+          <span style="font-size:0.78rem; color:var(--text-muted); align-self:center;">Quick add:</span>
+          <button type="button" class="preset-btn" onclick="addPreset('milk,butter,cream,cheese,whey,lactose,dairy')">Lactose</button>
+          <button type="button" class="preset-btn" onclick="addPreset('flour,wheat,gluten,bread,semolina,barley,rye')">Gluten</button>
+          <button type="button" class="preset-btn" onclick="addPreset('peanut,peanuts,peanut butter')">Peanut</button>
+          <button type="button" class="preset-btn" onclick="addPreset('egg,eggs,egg yolk,egg white')">Egg</button>
+          <button type="button" class="preset-btn" onclick="addPreset('shrimp,shellfish,crab,lobster,clam,oyster,scallop')">Shellfish</button>
+          <button type="button" class="preset-btn" onclick="addPreset('almond,walnut,cashew,pecan,pistachio,hazelnut,tree nut')">Tree Nuts</button>
         </div>
-
-        <!-- active allergen chips -->
-        <div
-          id="allergenChips"
-          style="
-            margin-top: 0.5rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-          "
-        ></div>
+        <div id="allergenChips" style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.4rem;"></div>
       </div>
 
-      <!-- ingredient include section -->
-      <div style="flex: 1; min-width: 240px">
-        <label
-          style="
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 4px;
-          "
-        >
+      <!-- ingredient include -->
+      <div style="flex:1; min-width:240px;">
+        <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">
           ✅ Foods (include)
         </label>
-        <div style="display: flex; gap: 0.5rem">
-          <input
-            type="text"
-            id="includeInput"
-            placeholder="e.g. chicken, garlic…"
-            style="flex: 1"
-          />
-          <button
-            type="button"
-            class="btn btn-secondary"
-            onclick="addInclude()"
-            style="padding: 0.55rem 1rem"
-          >
-            Add
-          </button>
+        <div style="display:flex; gap:0.5rem;">
+          <input type="text" id="includeInput" placeholder="e.g. chicken, garlic…" style="flex:1;" />
+          <button type="button" class="btn btn-secondary" onclick="addInclude()" style="padding:0.55rem 1rem;">Add</button>
         </div>
-        <input
-          type="hidden"
-          name="include"
-          id="includeHidden"
-          value="{{ include }}"
-        />
-        <div
-          id="includeChips"
-          style="
-            margin-top: 0.5rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-          "
-        ></div>
+        <input type="hidden" name="include" id="includeHidden" value="{{ include }}" />
+        <div id="includeChips" style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.4rem;"></div>
       </div>
     </div>
 
-    <div
-      style="
-        display: flex;
-        gap: 0.75rem;
-        align-items: center;
-        margin-top: 0.75rem;
-      "
-    >
-      <button type="button" class="btn btn-secondary" onclick="clearAll()">
-        ✕ Clear Filters
-      </button>
-      <span style="font-size: 0.85rem; color: var(--text-muted)"
-        >{{ recipes|length }} recipe{{ 's' if recipes|length != 1 }}</span
-      >
+    <!-- Row 3: controls bar — clear, count, and sort -->
+    <div style="display:flex; gap:0.75rem; align-items:center; margin-top:0.75rem; flex-wrap:wrap;">
+      <button type="button" class="btn btn-secondary" onclick="clearAll()">✕ Clear Filters</button>
+      <span style="font-size:0.85rem; color:var(--text-muted);">
+        {{ recipes|length }} recipe{{ 's' if recipes|length != 1 }}
+      </span>
+
+      <!-- Sorting Microservice -->
+      <div style="margin-left:auto; display:flex; align-items:center; gap:0.5rem;">
+        <label style="font-size:0.82rem; color:var(--text-muted); white-space:nowrap;">Sort by:</label>
+        <select name="sort" id="sortSelect" class="sort-select" onchange="document.getElementById('searchForm').submit()">
+          <option value=""             {% if not sort_param %}selected{% endif %}>Default</option>
+          <option value="title-ASC"   {% if sort_param == 'title-ASC'  %}selected{% endif %}>Title A → Z</option>
+          <option value="title-DESC"  {% if sort_param == 'title-DESC' %}selected{% endif %}>Title Z → A</option>
+        </select>
+      </div>
     </div>
+
   </form>
 
-  <hr
-    style="border: none; border-top: 1px solid var(--border); margin: 1.5rem 0"
-  />
+  <hr style="border:none; border-top:1px solid var(--border); margin:1.5rem 0;" />
 
-  <!-- IH#3: show basic info (photo + name); click for more details -->
   {% if recipes %}
   <div class="recipe-grid">
     {% for recipe in recipes %}
-    <a
-      href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}"
-      class="recipe-card"
-    >
+    <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="recipe-card">
       {% if recipe.image_url %}
       <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}" />
       {% else %}
@@ -228,20 +91,15 @@ endblock %} {% block content %}
   </div>
 
   {% else %}
-  <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted)">
+  <div style="text-align:center; padding:3rem 1rem; color:var(--text-muted);">
     {% if recipes|length == 0 and (query or allergens or include) %}
-    <div style="font-size: 2rem; margin-bottom: 0.75rem">🔍</div>
+    <div style="font-size:2rem; margin-bottom:0.75rem;">🔍</div>
     <strong>No recipes match your filters.</strong><br />
-    <span style="font-size: 0.9rem"
-      >Try adjusting your search or removing some allergens.</span
-    >
+    <span style="font-size:0.9rem;">Try adjusting your search or removing some allergens.</span>
     {% else %}
-    <div style="font-size: 2rem; margin-bottom: 0.75rem">📭</div>
+    <div style="font-size:2rem; margin-bottom:0.75rem;">📭</div>
     <strong>No recipes saved yet.</strong><br />
-    <span style="font-size: 0.9rem"
-      >Go to <a href="{{ url_for('import_page') }}">Import</a> to add your first
-      recipe!</span
-    >
+    <span style="font-size:0.9rem;">Go to <a href="{{ url_for('import_page') }}">Import</a> to add your first recipe!</span>
     {% endif %}
   </div>
   {% endif %}
@@ -254,66 +112,50 @@ endblock %} {% block content %}
     gap: 1.1rem;
   }
   .recipe-card {
-    display: flex;
-    flex-direction: column;
-    border-radius: var(--radius);
-    overflow: hidden;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    text-decoration: none;
-    color: var(--text);
+    display: flex; flex-direction: column;
+    border-radius: var(--radius); overflow: hidden;
+    border: 1px solid var(--border); background: var(--surface);
+    text-decoration: none; color: var(--text);
     box-shadow: var(--shadow);
-    transition:
-      transform 0.2s,
-      box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
   }
   .recipe-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.13);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.13);
     text-decoration: none;
   }
-  .recipe-card img {
-    width: 100%;
-    height: 140px;
-    object-fit: cover;
-  }
+  .recipe-card img { width:100%; height:140px; object-fit:cover; }
   .recipe-card-placeholder {
-    width: 100%;
-    height: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--btn-bg);
-    font-size: 2.5rem;
+    width:100%; height:140px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--btn-bg); font-size:2.5rem;
   }
-  .recipe-card-title {
-    padding: 0.6rem 0.75rem;
-    font-weight: 700;
-    font-size: 0.88rem;
-    line-height: 1.3;
-  }
+  .recipe-card-title { padding:0.6rem 0.75rem; font-weight:700; font-size:0.88rem; line-height:1.3; }
 
   .preset-btn {
-    background: var(--btn-bg);
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    padding: 3px 10px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    cursor: pointer;
+    background:var(--btn-bg); border:1px solid var(--border); border-radius:50px;
+    padding:3px 10px; font-size:0.78rem; font-weight:600;
+    cursor:pointer; color:var(--text); font-family:'Nunito',sans-serif;
+    transition:background 0.15s;
+  }
+  .preset-btn:hover { background:var(--btn-hover); }
+
+  .sort-select {
+    padding: 0.45rem 0.75rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    background: var(--bg);
     color: var(--text);
-    font-family: "Nunito", sans-serif;
-    transition: background 0.15s;
+    cursor: pointer;
   }
-  .preset-btn:hover {
-    background: var(--btn-hover);
-  }
+  .sort-select:focus { outline: none; border-color: var(--accent); }
 </style>
+{% endblock %}
 
-{% endblock %} {% block scripts %}
+{% block scripts %}
 <script>
-  // allergen chips
-
   let allergens = {{ allergen_list | tojson }};
   let includes  = "{{ include }}".split(',').map(s => s.trim()).filter(Boolean);
 
@@ -331,24 +173,19 @@ endblock %} {% block content %}
 
   function addAllergen() {
     const input = document.getElementById('allergenInput');
-    const vals = input.value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
-    vals.forEach(v => { if (!allergens.includes(v)) allergens.push(v); });
+    input.value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
+      .forEach(v => { if (!allergens.includes(v)) allergens.push(v); });
     input.value = '';
     renderAllergenChips();
   }
 
   function addPreset(csv) {
-    const vals = csv.split(',').map(s => s.trim().toLowerCase());
-    vals.forEach(v => { if (!allergens.includes(v)) allergens.push(v); });
+    csv.split(',').map(s => s.trim().toLowerCase())
+      .forEach(v => { if (!allergens.includes(v)) allergens.push(v); });
     renderAllergenChips();
   }
 
-  function removeAllergen(i) {
-    allergens.splice(i, 1);
-    renderAllergenChips();
-  }
-
-  // ── Include chip management ────────────────────────────────────────────────
+  function removeAllergen(i) { allergens.splice(i, 1); renderAllergenChips(); }
 
   function renderIncludeChips() {
     const container = document.getElementById('includeChips');
@@ -364,27 +201,23 @@ endblock %} {% block content %}
 
   function addInclude() {
     const input = document.getElementById('includeInput');
-    const vals = input.value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
-    vals.forEach(v => { if (!includes.includes(v)) includes.push(v); });
+    input.value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
+      .forEach(v => { if (!includes.includes(v)) includes.push(v); });
     input.value = '';
     renderIncludeChips();
   }
 
-  function removeInclude(i) {
-    includes.splice(i, 1);
-    renderIncludeChips();
-  }
+  function removeInclude(i) { includes.splice(i, 1); renderIncludeChips(); }
 
   function clearAll() {
-    allergens = [];
-    includes = [];
+    allergens = []; includes = [];
     document.getElementById('queryInput').value = '';
+    document.getElementById('sortSelect').value = '';
     renderAllergenChips();
     renderIncludeChips();
     document.getElementById('searchForm').submit();
   }
 
-  // allow pressing Enter in the allergen/include inputs
   document.getElementById('allergenInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); addAllergen(); }
   });
@@ -392,13 +225,11 @@ endblock %} {% block content %}
     if (e.key === 'Enter') { e.preventDefault(); addInclude(); }
   });
 
-  // sync hidden fields before form submit
   document.getElementById('searchForm').addEventListener('submit', () => {
     document.getElementById('allergensHidden').value = allergens.join(',');
     document.getElementById('includeHidden').value   = includes.join(',');
   });
 
-  // init chips from server-rendered values
   renderAllergenChips();
   renderIncludeChips();
 </script>
